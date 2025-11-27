@@ -1,8 +1,33 @@
-// Smooth scrolling for navigation links
+// Mobile menu functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scroll for navigation links
-    const navLinks = document.querySelectorAll('a[href^="#"]');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mainNav = document.getElementById('mainNav');
+    const header = document.querySelector('.header');
     
+    // Toggle mobile menu
+    mobileMenuBtn.addEventListener('click', function() {
+        mainNav.classList.toggle('active');
+        const icon = this.querySelector('i');
+        if (mainNav.classList.contains('active')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+    
+    // Close mobile menu when clicking on a link
+    const navLinks = document.querySelectorAll('.nav a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            mainNav.classList.remove('active');
+            mobileMenuBtn.querySelector('i').classList.remove('fa-times');
+            mobileMenuBtn.querySelector('i').classList.add('fa-bars');
+        });
+    });
+    
+    // Smooth scrolling for navigation links
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -23,56 +48,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Form submission handling
-    const contactForm = document.querySelector('.contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const name = this.querySelector('input[type="text"]').value;
-            const email = this.querySelector('input[type="email"]').value;
-            const message = this.querySelector('textarea').value;
-            
-            // Simple validation
-            if (!name || !email || !message) {
-                alert('Please fill in all fields.');
-                return;
-            }
-            
-            // Simulate form submission
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                alert('Thank you for your message! We\'ll get back to you soon.');
-                this.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-    }
-
-    // Add scroll effect to header
-    const header = document.querySelector('.header');
-    
+    // Header scroll effect
     function updateHeaderOnScroll() {
         if (window.scrollY > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-            header.style.backdropFilter = 'blur(10px)';
+            header.classList.add('scrolled');
         } else {
-            header.style.background = 'var(--background)';
-            header.style.backdropFilter = 'none';
+            header.classList.remove('scrolled');
         }
     }
     
     window.addEventListener('scroll', updateHeaderOnScroll);
-    updateHeaderOnScroll(); // Initial call
+    updateHeaderOnScroll();
+
+    // Form handling
+    const contactForm = document.getElementById('contactForm');
+    const successModal = document.getElementById('successModal');
+    const closeModal = document.querySelector('.close-modal');
+    const closeSuccessModal = document.getElementById('closeSuccessModal');
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (validateForm()) {
+                submitForm();
+            }
+        });
+
+        // Real-time validation
+        const inputs = contactForm.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                validateField(this);
+            });
+            
+            input.addEventListener('input', function() {
+                clearError(this);
+            });
+        });
+    }
+
+    // Modal functionality
+    if (closeModal) {
+        closeModal.addEventListener('click', function() {
+            successModal.style.display = 'none';
+        });
+    }
+
+    if (closeSuccessModal) {
+        closeSuccessModal.addEventListener('click', function() {
+            successModal.style.display = 'none';
+        });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === successModal) {
+            successModal.style.display = 'none';
+        }
+    });
 
     // Add loading animation for service cards
     const observerOptions = {
@@ -90,14 +124,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
 
     // Observe service cards and stats
-    document.querySelectorAll('.service-card, .stat').forEach(el => {
+    document.querySelectorAll('.service-card, .stat, .portfolio-item').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
 
-    // Social media links (replace with actual URLs)
+    // Social media links
     const socialLinks = document.querySelectorAll('.social-links a');
     const socialUrls = [
         'https://facebook.com/markmixstudios',
@@ -108,10 +142,131 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     socialLinks.forEach((link, index) => {
-        link.href = socialUrls[index];
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
+        if (index < socialUrls.length) {
+            link.href = socialUrls[index];
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+        }
     });
+
+    // Form validation functions
+    function validateForm() {
+        let isValid = true;
+        const fields = [
+            { id: 'name', type: 'text' },
+            { id: 'email', type: 'email' },
+            { id: 'service', type: 'select' },
+            { id: 'message', type: 'text' }
+        ];
+
+        fields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (!validateField(element)) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    function validateField(field) {
+        const value = field.value.trim();
+        const errorElement = document.getElementById(field.id + 'Error');
+
+        // Clear previous error
+        clearError(field);
+
+        // Validation rules
+        if (field.type === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                showError(field, 'Please enter a valid email address');
+                return false;
+            }
+        }
+
+        if (field.required && !value) {
+            showError(field, 'This field is required');
+            return false;
+        }
+
+        if (field.id === 'message' && value.length < 10) {
+            showError(field, 'Message must be at least 10 characters long');
+            return false;
+        }
+
+        return true;
+    }
+
+    function showError(field, message) {
+        const errorElement = document.getElementById(field.id + 'Error');
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+        field.style.borderColor = '#e53e3e';
+    }
+
+    function clearError(field) {
+        const errorElement = document.getElementById(field.id + 'Error');
+        errorElement.classList.remove('show');
+        field.style.borderColor = '';
+    }
+
+    // Form submission
+    function submitForm() {
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        // Show loading state
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'flex';
+        submitBtn.disabled = true;
+
+        // Simulate API call (replace with actual form submission)
+        setTimeout(() => {
+            // Reset form
+            contactForm.reset();
+            
+            // Show success modal
+            successModal.style.display = 'block';
+            
+            // Reset button state
+            btnText.style.display = 'flex';
+            btnLoading.style.display = 'none';
+            submitBtn.disabled = false;
+        }, 2000);
+    }
+
+    // Lazy loading for images
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+
+    // Add service worker for PWA (optional)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(function(error) {
+                    console.log('ServiceWorker registration failed');
+                });
+        });
+    }
 });
 
 // Performance optimization
@@ -120,4 +275,22 @@ window.addEventListener('load', function() {
     setTimeout(() => {
         document.body.classList.add('loaded');
     }, 500);
+
+    // Preload critical images
+    const criticalImages = [
+        'https://www.markmixstudios.com/msl-images/MarkmixStudios.png'
+    ];
+
+    criticalImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
 });
+
+// Error handling for images
+document.addEventListener('error', function(e) {
+    if (e.target.tagName === 'IMG') {
+        e.target.style.display = 'none';
+        console.warn('Image failed to load:', e.target.src);
+    }
+}, true);
