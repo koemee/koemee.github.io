@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 28px;
+            color: #444;
+            font-size: 2em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        canvas {
+            max-width: 100%;
+            margin: 25px auto;
+            border: 1px solid #eee;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            display: block;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px;
+            border-radius: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 17px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>QR Code Generator</h1>
+
+    <input type="text" id="text" placeholder="Enter text or URL..." value="" autofocus/>
+
+    <select id="size">
+        <option value="150">Small (150px)</option>
+        <option value="200">Medium (200px)</option>
+        <option value="300">Large (300px)</option>
+        <option value="400" selected>Extra Large (400px)</option>
+    </select>
+
+    <canvas id="qr"></canvas>
+
+    <button id="download" style="display:none;">Download as PNG</button>
+
+    <div class="footer">
+        Demo by <a href="https://www.markmixstudios.com/tools" target="_blank">Markmix Studios Limited.</a>
+    </div>
+</div>
+
+<script>
+    const inputText = document.getElementById('text');
+    const qrCanvas = document.getElementById('qr');
+    const sizeSelect = document.getElementById('size');
+    const downloadBtn = document.getElementById('download');
+
+    function generateQR () {
+        const text = inputText.value.trim();
+        if(!text) {
+            qrCanvas.width = qrCanvas.height = 1;
+            downloadBtn.style.display = 'none';
+            return;
+        }
+
+        const size = parseInt(sizeSelect.value);
+
+        qrCanvas.width = size;
+        qrCanvas.height = size;
+
+        new QRious({
+            element: qrCanvas,
+            value: text,
+            size: size,
+            padding: 10,
+            background: '#ffffff',
+            foreground: '#000000'
+        });
+
+        downloadBtn.style.display = 'block';
+    }
+
+    let timeout;
+    inputText.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(generateQR, 400);
+    });
+
+    inputText.addEventListener('keypress', event => {
+        if(event.key === 'Enter') generateQR();
+    });
+
+    sizeSelect.addEventListener('change', generateQR);
+
+    downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'qrcode.png';
+        link.href = qrCanvas.toDataURL('image/png');
+        link.click();
+    });
+
+    window.onload = generateQR;
+</script>
+</body>
+</html>
