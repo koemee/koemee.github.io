@@ -141,6 +141,11 @@
   .hero-grid{
     display:grid; grid-template-columns:1.15fr .85fr; gap:56px; align-items:center;
   }
+  /* prevents nowrap content (e.g. the ticker) from forcing grid tracks wider than the viewport */
+  .hero-grid > *, .services-grid > *, .svc-mini-grid > *, .process > *,
+  .strip > *, .contact-grid > *, .values-grid > *{
+    min-width:0;
+  }
   .hero h1{
     font-size:clamp(38px, 5vw, 64px);
     margin:20px 0 24px;
