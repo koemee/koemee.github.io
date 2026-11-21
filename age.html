@@ -3,140 +3,362 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Age & Milestone Calculator</title>
+  <title>Age & Milestone Calculator • Markmix Digital</title>
+  <meta name="description" content="Calculate your exact age, live seconds lived, zodiac signs, and upcoming life milestones. Powered by Markmix Digital." />
   <style>
+    :root {
+      --bg: #090d16;
+      --card: #111827;
+      --surface: #1f2937;
+      --border: #374151;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --btn: #2563eb;
+      --btn-hover: #1d4ed8;
+      --error: #f87171;
+    }
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 1rem;
     }
     .card {
-      background: #1e293b;
+      background: var(--card);
       padding: 2rem;
-      border-radius: 12px;
+      border-radius: 20px;
       width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
     }
     h1 {
-      font-size: 1.5rem;
-      margin-top: 0;
-      text-align: center;
+      font-size: 1.55rem;
+      margin: 0 0 0.3rem 0;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
     }
     label {
       display: block;
-      margin-bottom: 0.5rem;
-      color: #94a3b8;
-      font-size: 0.9rem;
+      margin-bottom: 0.45rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
     }
     input[type="date"] {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #f8fafc;
+      flex: 1;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
       font-size: 1rem;
-      box-sizing: border-box;
-      margin-bottom: 1rem;
+      font-family: inherit;
+      color-scheme: dark;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="date"]:focus {
+      border-color: var(--accent);
     }
     button {
-      width: 100%;
-      padding: 0.75rem;
+      padding: 0.75rem 1.25rem;
       border: none;
-      border-radius: 8px;
-      background: #3b82f6;
+      border-radius: 10px;
+      background: var(--btn);
       color: white;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s;
     }
     button:hover {
-      background: #2563eb;
+      background: var(--btn-hover);
     }
-    .results {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #334155;
+    .error-msg {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
       display: none;
     }
-    .stat {
-      margin-bottom: 0.75rem;
-      font-size: 1rem;
+    .results {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 0.3s ease;
     }
-    .highlight {
-      color: #38bdf8;
-      font-weight: bold;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-age {
+      background: linear-gradient(145deg, #1f2937, #111827);
+      padding: 1.25rem 1rem;
+      border-radius: 14px;
+      text-align: center;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .hero-age .big {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .hero-age .live {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-wrap {
+      margin-top: 0.9rem;
+      text-align: left;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #090d16;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .box {
+      background: var(--surface);
+      padding: 0.85rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .box-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .box-val {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      color: var(--text);
+    }
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .secondary-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      padding: 0.7rem;
+    }
+    .secondary-btn:hover {
+      background: #374151;
+    }
+    .footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Age Calculator</h1>
-    <label for="dob">Enter Date of Birth</label>
-    <input type="date" id="dob" />
-    <button onclick="calculateAge()">Calculate Age</button>
+    <div class="header">
+      <div class="brand-badge">⬡ MARKMIX DIGITAL</div>
+      <h1>Age & Milestone Calculator</h1>
+      <div class="subtitle">Real-time age tracker, zodiac & life milestones</div>
+    </div>
+
+    <label for="dob">Select Date of Birth</label>
+    <div class="input-row">
+      <input type="date" id="dob" />
+      <button onclick="startCalculator()">Calculate</button>
+    </div>
+    <div class="error-msg" id="errorMsg">Please enter a valid date in the past.</div>
 
     <div class="results" id="results">
-      <div class="stat">Exact Age: <span class="highlight" id="exactAge"></span></div>
-      <div class="stat">Total Days Lived: <span class="highlight" id="totalDays"></span></div>
-      <div class="stat">Next Birthday In: <span class="highlight" id="nextBirthday"></span></div>
+      <div class="hero-age">
+        <div class="big" id="exactAge"></div>
+        <div class="live" id="liveTicker"></div>
+
+        <div class="progress-wrap">
+          <div class="progress-labels">
+            <span>Birthday Year Progress</span>
+            <span id="bdayPercent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="bdayFill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="box">
+          <div class="box-label">Born On</div>
+          <div class="box-val" id="bornDay"></div>
+        </div>
+        <div class="box">
+          <div class="box-label">Next Birthday</div>
+          <div class="box-val" id="nextBirthday"></div>
+        </div>
+        <div class="box">
+          <div class="box-label">Western Zodiac</div>
+          <div class="box-val" id="zodiac"></div>
+        </div>
+        <div class="box">
+          <div class="box-label">Generation</div>
+          <div class="box-val" id="generation"></div>
+        </div>
+        <div class="box">
+          <div class="box-label">Total Days Lived</div>
+          <div class="box-val" id="totalDays"></div>
+        </div>
+        <div class="box">
+          <div class="box-label" id="milestoneLabel">Next Milestone</div>
+          <div class="box-val" id="nextMilestone"></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="secondary-btn" id="copyBtn" onclick="copySummary()">Copy Summary</button>
+        <button class="secondary-btn" id="linkBtn" onclick="copyShareLink()">Share Result Link</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Powered by <a href="https://github.io" target="_blank" rel="noopener noreferrer">Markmix Digital</a>
     </div>
   </div>
 
   <script>
-    function calculateAge() {
-      const dobInput = document.getElementById("dob").value;
+    let tickerInterval = null;
+    let summaryText = "";
+
+    const dobField = document.getElementById("dob");
+    dobField.max = new Date().toISOString().split("T")[0];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const sharedDob = params.get("dob");
+      if (sharedDob) {
+        dobField.value = sharedDob;
+        startCalculator();
+      }
+    });
+
+    function getZodiac(month, day) {
+      const signs = [
+        ["Capricorn ♑", 19], ["Aquarius ♒", 18], ["Pisces ♓", 20],
+        ["Aries ♈", 19], ["Taurus ♉", 20], ["Gemini ♊", 20],
+        ["Cancer ♋", 22], ["Leo ♌", 22], ["Virgo ♍", 22],
+        ["Libra ♎", 22], ["Scorpio ♏", 21], ["Sagittarius ♐", 21],
+        ["Capricorn ♑", 31]
+      ];
+      return day <= signs[month] ? signs[month] : signs[month + 1];
+    }
+
+    function getGeneration(year) {
+      if (year >= 2013) return "Gen Alpha";
+      if (year >= 1997) return "Gen Z";
+      if (year >= 1981) return "Millennial";
+      if (year >= 1965) return "Gen X";
+      if (year >= 1946) return "Baby Boomer";
+      return "Silent Gen";
+    }
+
+    function startCalculator() {
+      const dobInput = dobField.value;
+      const errorMsg = document.getElementById("errorMsg");
+
       if (!dobInput) {
-        alert("Please select a valid date of birth.");
+        errorMsg.textContent = "Please select a valid date of birth.";
+        errorMsg.style.display = "block";
         return;
       }
 
       const dob = new Date(dobInput + "T00:00:00");
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const now = new Date();
 
-      if (dob > today) {
-        alert("Date of birth cannot be in the future.");
+      if (isNaN(dob.getTime()) || dob > now) {
+        errorMsg.textContent = "Date of birth cannot be in the future.";
+        errorMsg.style.display = "block";
         return;
       }
 
-      let years = today.getFullYear() - dob.getFullYear();
-      let months = today.getMonth() - dob.getMonth();
-      let days = today.getDate() - dob.getDate();
+      errorMsg.style.display = "none";
 
-      if (days < 0) {
-        months--;
-        const previousMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        days += previousMonth.getDate();
-      }
+      const url = new URL(window.location);
+      url.searchParams.set("dob", dobInput);
+      window.history.replaceState({}, "", url);
 
-      if (months < 0) {
-        years--;
-        months += 12;
-      }
+      if (tickerInterval) clearInterval(tickerInterval);
 
-      const oneDayMs = 1000 * 60 * 60 * 24;
-      const totalDays = Math.floor((today - dob) / oneDayMs);
-
-      let nextBday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
-      if (nextBday < today) {
-        nextBday.setFullYear(today.getFullYear() + 1);
-      }
-      const daysUntilBday = Math.ceil((nextBday - today) / oneDayMs);
-
-      document.getElementById("exactAge").textContent = `${years} years, ${months} months, ${days} days`;
-      document.getElementById("totalDays").textContent = totalDays.toLocaleString();
-      document.getElementById("nextBirthday").textContent =
-        daysUntilBday === 0 ? "Happy Birthday today!" : `${daysUntilBday} days`;
-
-      document.getElementById("results").style.display = "block";
-    }
-  </script>
-</body>
-</html>
+      const updateStats = () => {
